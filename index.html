@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Painel de Tarefas - Equipe Companheiro Peludo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --pink: #ec399a;
+      --turq: #48c1ce;
+      --bg: #020617;
+      --card: #0b1120;
+      --border: #1f2937;
+      --text-main: #e5e7eb;
+      --text-soft: #9ca3af;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, rgba(72,193,206,0.2), transparent 55%),
+                  radial-gradient(circle at bottom right, rgba(236,57,154,0.18), transparent 55%),
+                  #020617;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+    .shell {
+      width: 100%;
+      max-width: 1200px;
+    }
+    .card {
+      background: rgba(15,23,42,0.98);
+      border-radius: 18px;
+      padding: 16px 18px;
+      border: 1px solid rgba(148,163,184,0.5);
+      box-shadow: 0 24px 60px rgba(15,23,42,0.9);
+    }
+    header {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .logo-box {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: radial-gradient(circle at 0 0, var(--turq), transparent 60%),
+                  radial-gradient(circle at 100% 100%, var(--pink), transparent 60%),
+                  #020617;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      overflow: hidden;
+    }
+    .logo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+    header p {
+      margin: 2px 0 0;
+      font-size: 0.8rem;
+      color: var(--text-soft);
+    }
+    .tabs {
+      display: inline-flex;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #020617;
+      margin: 4px 0 10px;
+      overflow: hidden;
+    }
+    .tab-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-soft);
+      font-size: 0.78rem;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      background: linear-gradient(90deg, rgba(72,193,206,0.3), rgba(236,57,154,0.3));
+      color: var(--text-main);
+    }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.7);
+      background: radial-gradient(circle at 0 0, rgba(72,193,206,0.25), transparent 60%),
+                  radial-gradient(circle at 100% 100%, rgba(236,57,154,0.25), transparent 60%),
+                  #020617;
+      color: var(--text-main);
+      font-size: 0.8rem;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: #e5e7eb; }
+    .small { font-size: 0.76rem; color: var(--text-soft); }
+    select, input[type="text"], input[type="date"], textarea {
+      border-radius: 999px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: var(--text-main);
+      padding: 4px 8px;
+      font-size: 0.78rem;
+      width: 100%;
+      outline: none;
+    }
+    textarea {
+      border-radius: 8px;
+      resize: vertical;
+      min-height: 40px;
+      max-height: 90px;
+    }
+    .filter-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.76rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      min-width: 1000px;
+    }
+    .table-shell {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #020617;
+      overflow-x: auto;
+    }
+    thead {
+      background: #020617;
+    }
+    th, td {
+      border-bottom: 1px solid #111827;
+      padding: 6px 8px;
+      white-space: nowrap;
+      vertical-align: top;
+      position: relative;
+    }
+    th {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-soft);
+    }
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--pink);
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 0.7rem;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+    }
+    .status-afazer { background: #111827; border: 1px solid #4b5563; }
+    .status-afazer .status-dot { background: #9ca3af; }
+    .status-hoje { background: rgba(234,179,8,0.18); border: 1px solid #facc15; }
+    .status-hoje .status-dot { background: #facc15; }
+    .status-atrasada { background: rgba(239,68,68,0.2); border: 1px solid #f87171; }
+    .status-atrasada .status-dot { background: #ef4444; }
+    .status-concluida { background: rgba(22,163,74,0.18); border: 1px solid #4ade80; }
+    .status-concluida .status-dot { background: #22c55e; }
+    .status-andamento { background: rgba(56,189,248,0.14); border: 1px solid #38bdf8; }
+    .status-andamento .status-dot { background: #38bdf8; }
+    .danger {
+      font-size: 0.7rem;
+      color: #fca5a5;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .danger:hover { color: #fecaca; }
+    .subtasks-row td {
+      background: #020617;
+      border-bottom-color: #020617;
+    }
+    .subtasks-box {
+      border-radius: 8px;
+      border: 1px dashed #374151;
+      padding: 6px;
+    }
+    .subtasks-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .subtasks-header span {
+      font-size: 0.75rem;
+      color: var(--text-soft);
+    }
+    .subtasks-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+    .subtasks-table td {
+      border: none;
+      padding: 3px 4px;
+    }
+    .subtask-done-text {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+    .last-updated {
+      font-size: 0.72rem;
+      color: var(--text-soft);
+      display: block;
+    }
+    .history-btn {
+      border-radius: 999px;
+      border: 1px dashed #4b5563;
+      background: transparent;
+      color: var(--text-soft);
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      cursor: pointer;
+      margin-top: 2px;
+    }
+    .history-btn:hover { border-color: var(--pink); color: var(--text-main); }
+    .th-resizer {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 5px;
+      height: 100%;
+      cursor: col-resize;
+    }
+    .calendar-wrap { margin-top: 6px; }
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 6px;
+    }
+    .calendar-title { font-size: 0.9rem; }
+    .calendar-nav {
+      border-radius: 999px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: var(--text-main);
+      font-size: 0.78rem;
+      padding: 3px 8px;
+      cursor: pointer;
+    }
+    .calendar-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.76rem;
+    }
+    .calendar-table th,
+    .calendar-table td {
+      border: 1px solid #111827;
+      padding: 3px 4px;
+      vertical-align: top;
+    }
+    .calendar-day-number {
+      font-size: 0.7rem;
+      color: var(--text-soft);
+      margin-bottom: 2px;
+    }
+    .calendar-task {
+      border-radius: 6px;
+      padding: 1px 3px;
+      margin-bottom: 2px;
+      font-size: 0.7rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-left: 3px solid #4b5563;
+      background: #020617;
+    }
+    .calendar-task.status-concluida { border-left-color: #22c55e; }
+    .calendar-task.status-atrasada { border-left-color: #ef4444; }
+    .calendar-task.status-hoje { border-left-color: #facc15; }
+    .calendar-task.status-afazer,
+    .calendar-task.status-andamento { border-left-color: #38bdf8; }
+    .calendar-task span {
+      color: var(--text-soft);
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.72rem;
+      color: var(--text-soft);
+      margin-bottom: 4px;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+    .legend-afazer { background: #9ca3af; }
+    .legend-hoje { background: #facc15; }
+    .legend-atrasada { background: #ef4444; }
+    .legend-concluida { background: #22c55e; }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .modal {
+      background: #020617;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      padding: 10px 12px;
+      max-width: 500px;
+      width: calc(100% - 32px);
+      color: var(--text-main);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .modal-header h2 {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+    .modal-close {
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: transparent;
+      color: var(--text-main);
+      font-size: 0.8rem;
+      padding: 2px 6px;
+      cursor: pointer;
+    }
+    .modal-body {
+      max-height: 300px;
+      overflow-y: auto;
+      font-size: 0.78rem;
+    }
+    .modal-body ul { padding-left: 16px; }
+    .modal-body li { margin-bottom: 4px; }
+    @media (max-width: 800px) {
+      .card { padding: 12px; }
+      header { flex-direction: row; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="card">
+      <header>
+        <div class="logo-box">
+          <img src="https://companeropeludo.com/cdn/shop/files/Logotipo_Espanha_400x.png?v=1747325757" alt="Logo" />
+        </div>
+        <div>
+          <h1>Painel de Tarefas da Equipe</h1>
+          <p>Tarefas com responsável, prazos, descrição, subtarefas, histórico e calendário. Dados salvos no Supabase.</p>
+        </div>
+      </header>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-view="list">📋 Lista</button>
+        <button class="tab-btn" data-view="calendar">📅 Calendário</button>
+      </div>
+
+      <section id="view-list">
+        <div class="toolbar">
+          <div>
+            <button class="btn" id="btnAddTask">+ Nova tarefa</button>
+            <div class="small">Use subtarefas para detalhar entregas (Criativo 1, Criativo 2, etc.).</div>
+          </div>
+          <div class="filter-wrap">
+            <span>Responsável:</span>
+            <select id="filterOwner">
+              <option value="all">Todos</option>
+              <option value="Vivian">Vivian</option>
+              <option value="Pedro">Pedro</option>
+              <option value="Thiago">Thiago</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-shell">
+          <table id="tasksTable">
+            <thead>
+              <tr>
+                <th style="width:40px;">✔<div class="th-resizer"></div></th>
+                <th>Tarefa<div class="th-resizer"></div></th>
+                <th>Descrição<div class="th-resizer"></div></th>
+                <th>Responsável<div class="th-resizer"></div></th>
+                <th>Prazo<div class="th-resizer"></div></th>
+                <th>Recorrência<div class="th-resizer"></div></th>
+                <th>Última atualização<div class="th-resizer"></div></th>
+                <th>Status<div class="th-resizer"></div></th>
+                <th>Subtarefas<div class="th-resizer"></div></th>
+                <th><div class="th-resizer"></div></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="task-row template" style="display:none;">
+                <td><input type="checkbox" class="task-done"></td>
+                <td><input type="text" class="task-title" placeholder="Ex: Fazer criativos"></td>
+                <td><textarea class="task-desc" placeholder="Detalhes da tarefa..."></textarea></td>
+                <td>
+                  <select class="task-owner">
+                    <option value="">Selecione</option>
+                    <option value="Vivian">Vivian</option>
+                    <option value="Pedro">Pedro</option>
+                    <option value="Thiago">Thiago</option>
+                  </select>
+                </td>
+                <td><input type="date" class="task-deadline"></td>
+                <td>
+                  <select class="task-recurrence">
+                    <option value="none">Sem</option>
+                    <option value="daily">Diária</option>
+                    <option value="weekly">Semanal</option>
+                    <option value="monthly">Mensal</option>
+                  </select>
+                </td>
+                <td>
+                  <span class="last-updated">–</span>
+                  <button type="button" class="history-btn">Histórico</button>
+                </td>
+                <td class="status-cell">
+                  <span class="status-pill status-afazer">
+                    <span class="status-dot"></span>
+                    <span class="status-label">A fazer</span>
+                  </span>
+                </td>
+                <td>
+                  <button type="button" class="btn btn-subtasks-toggle">Subtarefas ▾</button>
+                </td>
+                <td><span class="danger remove-task">Remover</span></td>
+              </tr>
+              <tr class="subtasks-row template" style="display:none;">
+                <td colspan="10">
+                  <div class="subtasks-box">
+                    <div class="subtasks-header">
+                      <span>Subtarefas</span>
+                      <button type="button" class="btn btn-add-subtask">+ Subtarefa</button>
+                    </div>
+                    <table class="subtasks-table">
+                      <tbody>
+                        <tr class="subtask-row">
+                          <td style="width:26px;"><input type="checkbox" class="subtask-done"></td>
+                          <td><input type="text" class="subtask-title" placeholder="Ex: Criativo 1 - Reels"></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="view-calendar" style="display:none;">
+        <div class="calendar-wrap">
+          <div class="calendar-header">
+            <button class="calendar-nav" id="prevMonth">◀ Anterior</button>
+            <div class="calendar-title" id="calendarTitle">Mês Ano</div>
+            <button class="calendar-nav" id="nextMonth">Próximo ▶</button>
+          </div>
+          <div class="legend">
+            <span><span class="legend-dot legend-afazer"></span> A fazer / andamento</span>
+            <span><span class="legend-dot legend-hoje"></span> Hoje</span>
+            <span><span class="legend-dot legend-atrasada"></span> Atrasada</span>
+            <span><span class="legend-dot legend-concluida"></span> Concluída</span>
+          </div>
+          <table class="calendar-table">
+            <thead>
+              <tr>
+                <th>Dom</th><th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th><th>Sáb</th>
+              </tr>
+            </thead>
+            <tbody id="calendarBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Modal de histórico -->
+  <div class="modal-backdrop" id="historyBackdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="historyTitle">Histórico</h2>
+        <button type="button" class="modal-close" id="historyClose">Fechar</button>
+      </div>
+      <div class="modal-body">
+        <ul id="historyList"></ul>
+        <div id="historyEmpty" class="small" style="display:none;">Nenhuma alteração registrada ainda.</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const { createClient } = supabase;
+    const supabaseUrl = "https://lxhwgbxgxfnyxtwjvbdx.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx4aHdnYnhneGZueXh0d2p2YmR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2MTkzMTAsImV4cCI6MjA4MDE5NTMxMH0.JRyP-d4NaKJZVI7_fTLg2AJN2ytLnIs6aUjSDJ-vdb0";
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
+    const BOARD_ID = 1;
+
+    let tbody, taskTemplate, subTemplate;
+    let currentFilterOwner = "all";
+    let currentCalendarYear, currentCalendarMonth;
+    let saveTimeout = null;
+    let currentResizing = null;
+
+    function toDateInputValue(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+    function parseDate(str) {
+      if (!str) return null;
+      const [y,m,d] = str.split("-").map(Number);
+      if (!y || !m || !d) return null;
+      return new Date(y, m-1, d);
+    }
+    function isSameDay(a,b) {
+      return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+    }
+    function formatDateTime(date) {
+      const dd = String(date.getDate()).padStart(2,"0");
+      const mm = String(date.getMonth()+1).padStart(2,"0");
+      const yyyy = date.getFullYear();
+      const hh = String(date.getHours()).padStart(2,"0");
+      const mi = String(date.getMinutes()).padStart(2,"0");
+      return `${dd}/${mm}/${yyyy} ${hh}:${mi}`;
+    }
+    function formatHistoryEntry(entry) {
+      const ts = new Date(entry.timestamp);
+      return `${formatDateTime(ts)} — ${entry.owner} — ${entry.description}`;
+    }
+    function scheduleSave() {
+      if (saveTimeout) clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(saveBoardToSupabase, 700);
+    }
+    function updateStatus(row) {
+      const done = row.querySelector(".task-done").checked;
+      const deadlineVal = row.querySelector(".task-deadline").value;
+      const pill = row.querySelector(".status-pill");
+      const label = row.querySelector(".status-label");
+      pill.className = "status-pill";
+      const today = new Date(); today.setHours(0,0,0,0);
+      if (done) {
+        pill.classList.add("status-concluida");
+        label.textContent = "Concluída";
+      } else {
+        const d = parseDate(deadlineVal);
+        if (!d) {
+          pill.classList.add("status-andamento");
+          label.textContent = "Em andamento";
+        } else {
+          const dd = new Date(d.getTime()); dd.setHours(0,0,0,0);
+          if (dd < today) { pill.classList.add("status-atrasada"); label.textContent = "Atrasada"; }
+          else if (isSameDay(dd,today)) { pill.classList.add("status-hoje"); label.textContent = "Hoje"; }
+          else { pill.classList.add("status-afazer"); label.textContent = "A fazer"; }
+        }
+      }
+    }
+    function addHistory(row, description) {
+      const ownerSel = row.querySelector(".task-owner");
+      const owner = ownerSel.value || "Sem responsável";
+      if (!row._history) row._history = [];
+      const entry = { timestamp: new Date().toISOString(), owner, description };
+      row._history.push(entry);
+      const span = row.querySelector(".last-updated");
+      span.textContent = formatHistoryEntry(entry);
+      scheduleSave();
+    }
+    function openHistory(row) {
+      const list = document.getElementById("historyList");
+      const empty = document.getElementById("historyEmpty");
+      const title = document.getElementById("historyTitle");
+      const titleVal = row.querySelector(".task-title").value || "(sem título)";
+      title.textContent = "Histórico - " + titleVal;
+      list.innerHTML = "";
+      const hist = row._history || [];
+      if (!hist.length) {
+        empty.style.display = "block";
+      } else {
+        empty.style.display = "none";
+        hist.forEach(h => {
+          const li = document.createElement("li");
+          li.textContent = formatHistoryEntry(h);
+          list.appendChild(li);
+        });
+      }
+      document.getElementById("historyBackdrop").style.display = "flex";
+    }
+    function closeHistory() {
+      document.getElementById("historyBackdrop").style.display = "none";
+    }
+    function checkSubtasksComplete(row, subtasksBox) {
+      const checks = subtasksBox.querySelectorAll(".subtask-done");
+      if (!checks.length) return;
+      const allDone = Array.from(checks).every(c => c.checked);
+      const mainCb = row.querySelector(".task-done");
+      mainCb.checked = allDone;
+      updateStatus(row);
+      addHistory(row, allDone ? "Todas as subtarefas concluídas" : "Alguma subtarefa foi marcada como não concluída");
+    }
+    function attachSubtasks(subRow, row) {
+      const tbodySub = subRow.querySelector("tbody");
+      const btnAdd = subRow.querySelector(".btn-add-subtask");
+      function attachEvents(tr) {
+        const cb = tr.querySelector(".subtask-done");
+        const input = tr.querySelector(".subtask-title");
+        cb.addEventListener("change", () => {
+          if (cb.checked) input.classList.add("subtask-done-text"); else input.classList.remove("subtask-done-text");
+          checkSubtasksComplete(row, subRow);
+        });
+        input.addEventListener("change", () => {
+          addHistory(row, `Subtarefa atualizada: "${input.value || "(sem título)"}"`);
+        });
+      }
+      tbodySub.querySelectorAll(".subtask-row").forEach(attachEvents);
+      btnAdd.addEventListener("click", () => {
+        const base = tbodySub.querySelector(".subtask-row");
+        const clone = base.cloneNode(true);
+        clone.querySelector(".subtask-done").checked = false;
+        const t = clone.querySelector(".subtask-title");
+        t.value = "";
+        t.classList.remove("subtask-done-text");
+        tbodySub.appendChild(clone);
+        attachEvents(clone);
+        addHistory(row, "Nova subtarefa adicionada");
+      });
+    }
+    function attachRowEvents(row, subRow) {
+      row._history = row._history || [];
+      const doneCb = row.querySelector(".task-done");
+      const title = row.querySelector(".task-title");
+      const desc = row.querySelector(".task-desc");
+      const owner = row.querySelector(".task-owner");
+      const deadline = row.querySelector(".task-deadline");
+      const recur = row.querySelector(".task-recurrence");
+      const remove = row.querySelector(".remove-task");
+      const toggleSub = row.querySelector(".btn-subtasks-toggle");
+      const histBtn = row.querySelector(".history-btn");
+
+      doneCb.addEventListener("change", () => {
+        const r = recur.value;
+        if (doneCb.checked && r !== "none") {
+          const current = parseDate(deadline.value) || new Date();
+          const before = formatDateTime(current);
+          if (r === "daily") current.setDate(current.getDate()+1);
+          if (r === "weekly") current.setDate(current.getDate()+7);
+          if (r === "monthly") current.setMonth(current.getMonth()+1);
+          deadline.value = toDateInputValue(current);
+          doneCb.checked = false;
+          updateStatus(row);
+          addHistory(row, `Tarefa recorrente: prazo avançou de ${before} para ${formatDateTime(current)}`);
+        } else {
+          updateStatus(row);
+          addHistory(row, doneCb.checked ? "Tarefa marcada como concluída" : "Tarefa marcada como não concluída");
+        }
+      });
+      title.addEventListener("change", () => addHistory(row, `Título atualizado: "${title.value || "(vazio)"}"`));
+      desc.addEventListener("change", () => addHistory(row, "Descrição atualizada"));
+      owner.addEventListener("change", () => { addHistory(row, `Responsável: ${owner.value || "sem"}`); applyOwnerFilter(); });
+      deadline.addEventListener("change", () => { updateStatus(row); addHistory(row, "Prazo atualizado"); });
+      recur.addEventListener("change", () => { addHistory(row, `Recorrência: ${recur.value}`); });
+      remove.addEventListener("click", () => {
+        if (confirm("Remover esta tarefa?")) {
+          subRow.remove();
+          row.remove();
+          scheduleSave();
+        }
+      });
+      toggleSub.addEventListener("click", () => {
+        const visible = subRow.style.display !== "none";
+        subRow.style.display = visible ? "none" : "";
+        toggleSub.textContent = visible ? "Subtarefas ▾" : "Subtarefas ▴";
+      });
+      histBtn.addEventListener("click", () => openHistory(row));
+      attachSubtasks(subRow, row);
+      updateStatus(row);
+    }
+    function createRowFromData(task) {
+      const row = taskTemplate.cloneNode(true);
+      const subRow = subTemplate.cloneNode(true);
+      row.classList.remove("template");
+      subRow.classList.remove("template");
+      row.style.display = "";
+      subRow.style.display = "none";
+      tbody.appendChild(row);
+      tbody.appendChild(subRow);
+
+      const title = row.querySelector(".task-title");
+      const desc = row.querySelector(".task-desc");
+      const owner = row.querySelector(".task-owner");
+      const deadline = row.querySelector(".task-deadline");
+      const recur = row.querySelector(".task-recurrence");
+      const doneCb = row.querySelector(".task-done");
+      const lastSpan = row.querySelector(".last-updated");
+
+      row._history = (task && task.history) ? task.history.slice() : [];
+
+      if (task) {
+        title.value = task.title || "";
+        desc.value = task.description || "";
+        owner.value = task.owner || "";
+        deadline.value = task.deadline || "";
+        recur.value = task.recurrence || "none";
+        doneCb.checked = !!task.done;
+        if (row._history.length) lastSpan.textContent = formatHistoryEntry(row._history[row._history.length-1]);
+      }
+
+      const subtBody = subRow.querySelector("tbody");
+      const baseSub = subtBody.querySelector(".subtask-row");
+      if (task && Array.isArray(task.subtasks) && task.subtasks.length) {
+        subtBody.innerHTML = "";
+        task.subtasks.forEach(st => {
+          const tr = baseSub.cloneNode(true);
+          const cb = tr.querySelector(".subtask-done");
+          const ti = tr.querySelector(".subtask-title");
+          cb.checked = !!st.done;
+          ti.value = st.title || "";
+          if (cb.checked) ti.classList.add("subtask-done-text");
+          subtBody.appendChild(tr);
+        });
+      }
+
+      attachRowEvents(row, subRow);
+      return row;
+    }
+    function addNewRow() {
+      const row = createRowFromData(null);
+      addHistory(row, "Tarefa criada");
+      applyOwnerFilter();
+    }
+    function getBoardState() {
+      const rows = Array.from(tbody.querySelectorAll(".task-row")).filter(r=>!r.classList.contains("template"));
+      return {
+        tasks: rows.map(row => {
+          const subRow = row.nextElementSibling;
+          const subs = [];
+          if (subRow && subRow.classList.contains("subtasks-row")) {
+            subRow.querySelectorAll(".subtask-row").forEach(tr => {
+              subs.push({
+                title: tr.querySelector(".subtask-title").value,
+                done: tr.querySelector(".subtask-done").checked
+              });
+            });
+          }
+          return {
+            title: row.querySelector(".task-title").value,
+            description: row.querySelector(".task-desc").value,
+            owner: row.querySelector(".task-owner").value,
+            deadline: row.querySelector(".task-deadline").value,
+            recurrence: row.querySelector(".task-recurrence").value,
+            done: row.querySelector(".task-done").checked,
+            history: row._history || [],
+            subtasks: subs
+          };
+        })
+      };
+    }
+    async function saveBoardToSupabase() {
+      const state = getBoardState();
+      try {
+        const { error } = await supabaseClient.from("task_boards").upsert(
+          { id: BOARD_ID, data: state },
+          { onConflict: "id" }
+        );
+        if (error) console.error("Erro ao salvar:", error);
+      } catch (e) {
+        console.error("Erro ao salvar:", e);
+      }
+    }
+    function restoreBoard(state) {
+      tbody.querySelectorAll("tr").forEach(tr => {
+        if (!tr.classList.contains("template")) tr.remove();
+      });
+      const tasks = (state && Array.isArray(state.tasks)) ? state.tasks : [];
+      if (!tasks.length) {
+        addNewRow();
+      } else {
+        tasks.forEach(t => createRowFromData(t));
+      }
+    }
+    async function loadBoardFromSupabase() {
+      try {
+        const { data, error } = await supabaseClient
+          .from("task_boards")
+          .select("data")
+          .eq("id", BOARD_ID)
+          .maybeSingle();
+        if (error) {
+          console.error("Erro ao carregar:", error);
+          addNewRow();
+          return;
+        }
+        if (!data || !data.data) {
+          addNewRow();
+        } else {
+          restoreBoard(data.data);
+        }
+      } catch (e) {
+        console.error("Erro ao carregar:", e);
+        addNewRow();
+      }
+    }
+    function applyOwnerFilter() {
+      const rows = Array.from(tbody.querySelectorAll(".task-row")).filter(r=>!r.classList.contains("template"));
+      rows.forEach(row => {
+        const owner = row.querySelector(".task-owner").value || "";
+        const subRow = row.nextElementSibling;
+        const show = currentFilterOwner === "all" || owner === currentFilterOwner;
+        row.style.display = show ? "" : "none";
+        if (subRow && subRow.classList.contains("subtasks-row")) {
+          if (!show) subRow.style.display = "none";
+        }
+      });
+      if (document.getElementById("view-calendar").style.display !== "none") {
+        renderCalendar();
+      }
+    }
+    function getTasksForCalendar() {
+      const rows = Array.from(tbody.querySelectorAll(".task-row")).filter(r=>!r.classList.contains("template"));
+      const tasks = [];
+      rows.forEach(row => {
+        if (row.style.display === "none") return;
+        const owner = row.querySelector(".task-owner").value || "";
+        if (currentFilterOwner !== "all" && owner !== currentFilterOwner) return;
+        const deadline = row.querySelector(".task-deadline").value;
+        if (!deadline) return;
+        const title = row.querySelector(".task-title").value || "(sem título)";
+        const pill = row.querySelector(".status-pill");
+        let status = "afazer";
+        if (pill.classList.contains("status-concluida")) status = "concluida";
+        else if (pill.classList.contains("status-atrasada")) status = "atrasada";
+        else if (pill.classList.contains("status-hoje")) status = "hoje";
+        else if (pill.classList.contains("status-andamento")) status = "andamento";
+        tasks.push({ deadline, title, owner, status });
+      });
+      return tasks;
+    }
+    function renderCalendar() {
+      const body = document.getElementById("calendarBody");
+      const title = document.getElementById("calendarTitle");
+      body.innerHTML = "";
+      const year = currentCalendarYear;
+      const month = currentCalendarMonth;
+      const monthNames = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+      title.textContent = monthNames[month] + " " + year;
+      const first = new Date(year, month, 1);
+      const startDow = first.getDay();
+      const daysInMonth = new Date(year, month+1, 0).getDate();
+      const tasks = getTasksForCalendar();
+      const today = new Date(); today.setHours(0,0,0,0);
+      let day = 1;
+      for (let week=0; week<6; week++) {
+        const tr = document.createElement("tr");
+        let any = false;
+        for (let dow=0; dow<7; dow++) {
+          const td = document.createElement("td");
+          if (week===0 && dow<startDow || day>daysInMonth) {
+            tr.appendChild(td);
+            continue;
+          }
+          any = true;
+          const cellDate = new Date(year, month, day);
+          cellDate.setHours(0,0,0,0);
+          const dateStr = toDateInputValue(cellDate);
+          const num = document.createElement("div");
+          num.className = "calendar-day-number";
+          num.textContent = day;
+          td.appendChild(num);
+          if (isSameDay(cellDate, today)) num.style.color = "#facc15";
+          tasks.filter(t=>t.deadline===dateStr).forEach(t => {
+            const div = document.createElement("div");
+            div.className = "calendar-task status-" + t.status;
+            div.textContent = t.title;
+            if (t.owner) {
+              const s = document.createElement("span");
+              s.textContent = " · " + t.owner;
+              div.appendChild(s);
+            }
+            td.appendChild(div);
+          });
+          tr.appendChild(td);
+          day++;
+        }
+        if (!any) break;
+        body.appendChild(tr);
+      }
+    }
+    function setupTabs() {
+      const listView = document.getElementById("view-list");
+      const calView = document.getElementById("view-calendar");
+      const buttons = document.querySelectorAll(".tab-btn");
+      buttons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          buttons.forEach(b=>b.classList.remove("active"));
+          btn.classList.add("active");
+          if (btn.dataset.view === "list") {
+            listView.style.display = "";
+            calView.style.display = "none";
+          } else {
+            listView.style.display = "none";
+            calView.style.display = "";
+            renderCalendar();
+          }
+        });
+      });
+    }
+    function setupCalendarNav() {
+      document.getElementById("prevMonth").addEventListener("click", () => {
+        currentCalendarMonth--;
+        if (currentCalendarMonth<0) { currentCalendarMonth=11; currentCalendarYear--; }
+        renderCalendar();
+      });
+      document.getElementById("nextMonth").addEventListener("click", () => {
+        currentCalendarMonth++;
+        if (currentCalendarMonth>11) { currentCalendarMonth=0; currentCalendarYear++; }
+        renderCalendar();
+      });
+    }
+    function setupFilter() {
+      document.getElementById("filterOwner").addEventListener("change", e => {
+        currentFilterOwner = e.target.value || "all";
+        applyOwnerFilter();
+      });
+    }
+    function setupColumnResizing() {
+      document.querySelectorAll("th").forEach(th => {
+        const res = th.querySelector(".th-resizer");
+        if (!res) return;
+        res.addEventListener("mousedown", e => {
+          e.preventDefault();
+          currentResizing = { th, startX: e.pageX, startWidth: th.offsetWidth };
+          document.addEventListener("mousemove", onMouseMove);
+          document.addEventListener("mouseup", onMouseUp);
+        });
+      });
+    }
+    function onMouseMove(e) {
+      if (!currentResizing) return;
+      const dx = e.pageX - currentResizing.startX;
+      const w = Math.max(60, currentResizing.startWidth + dx);
+      currentResizing.th.style.width = w + "px";
+    }
+    function onMouseUp() {
+      if (!currentResizing) return;
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+      currentResizing = null;
+    }
+    document.addEventListener("DOMContentLoaded", async () => {
+      tbody = document.querySelector("#tasksTable tbody");
+      taskTemplate = tbody.querySelector(".task-row.template");
+      subTemplate = tbody.querySelector(".subtasks-row.template");
+
+      document.getElementById("btnAddTask").addEventListener("click", addNewRow);
+      setupTabs();
+      setupFilter();
+      setupCalendarNav();
+      setupColumnResizing();
+      document.getElementById("historyClose").addEventListener("click", closeHistory);
+      document.getElementById("historyBackdrop").addEventListener("click", (e)=>{
+        if (e.target.id==="historyBackdrop") closeHistory();
+      });
+
+      const now = new Date();
+      currentCalendarYear = now.getFullYear();
+      currentCalendarMonth = now.getMonth();
+
+      await loadBoardFromSupabase();
+    });
+  </script>
+</body>
+</html>
